@@ -1,20 +1,26 @@
 <?php
-//header('Content-Type: application/json');
+header('Content-Type: application/json');
   // เชื่อมต่อฐานข้อมูล
-include 'condb.php';
+require 'condb.php';
 
 try {
  //ตรวจสอบคำขอที่ได้รับจาก Client  ตามประเภทของคำ ว่าเป็น GET หรือ POST
     $method = $_SERVER['REQUEST_METHOD'];
 
-   if ($method == 'POST') {
+    if ($method == 'GET') {
+        // ดึงข้อมูลลูกค้าทั้งหมด
+        $stmt = $conn->prepare("SELECT * FROM Customers");
+        $stmt->execute();
+        $customers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode(["success" => true, "data" => $customers]);
+    } elseif ($method == 'POST') {
         // รับข้อมูลจาก Client
         $data = json_decode(file_get_contents("php://input"), true);
 
         // ตรวจสอบค่าที่จำเป็น
         if (isset($data['firstName'], $data['lastName'], $data['phone'], $data['username'], $data['password'])) {
             // เพิ่มข้อมูลลูกค้าใหม่
-          $stmt = $conn->prepare("INSERT INTO customers (firstName, lastName, phone, username, password) VALUES (:firstName, :lastName, :phone, :username, :password)");
+            $stmt = $conn->prepare("INSERT INTO customers (firstName, lastName, phone, username, password) VALUES (:firstName, :lastName, :phone, :username, :password)");
             $stmt->bindParam(':firstName', $data['firstName']);
             $stmt->bindParam(':lastName', $data['lastName']);
             $stmt->bindParam(':phone', $data['phone']);
@@ -30,7 +36,9 @@ try {
         } else {
             echo json_encode(["success" => false, "message" => "Missing required fields"]);
         }
-    } 
+    } else {
+        echo json_encode(["success" => false, "message" => "Invalid request method"]);
+    }
 } catch (PDOException $e) {
     echo json_encode(["success" => false, "message" => "Database error: " . $e->getMessage()]);
 }

@@ -1,14 +1,23 @@
 <?php
+
+  // เชื่อมต่อฐานข้อมูล
 include 'condb.php';
 
-header('Content-Type: application/json');
-
 try {
-    $stmt = $conn->query("SELECT * FROM customers");
-    $datas = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    echo json_encode($datas);
-    
-} catch (PDOException $e) {
-    echo json_encode(["error" => $e->getMessage()]);
+ //ตรวจสอบคำขอที่ได้รับจาก Client  ตามประเภทของคำ ว่าเป็น GET หรือ POST
+    $method = $_SERVER['REQUEST_METHOD'];
+
+    if ($method == 'GET') {
+        // ดึงข้อมูลลูกค้าทั้งหมด
+        $stmt = $conn->prepare("SELECT * FROM Customers");
+        $stmt->execute();
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode(["success" => true, "data" => $data]);
+    }else {
+        echo json_encode(["success" => false, "message" => "Invalid request method"]);
+      }
+
+}catch (PDOException $e) {
+    echo json_encode(["success" => false, "message" => "Database error: " . $e->getMessage()]);
 }
 ?>

@@ -5,9 +5,10 @@
     <div class="mb-3">
       <a class="btn btn-primary" href="/add_customer" role="button">Add+</a>
     </div>
+
     <!-- ตารางแสดงข้อมูลลูกค้า -->
     <table class="table table-bordered table-striped">
-      <thead class="table-dark">
+      <thead class="table-primary">
         <tr>
           <th>ID</th>
           <th>ชื่อ</th>
@@ -49,14 +50,27 @@ export default {
     const loading = ref(true);
     const error = ref(null);
 
-    // ฟังก์ชันดึงข้อมูลจาก API
+    // ฟังก์ชันดึงข้อมูลจาก API ด้วย GET
     const fetchCustomers = async () => {
       try {
-        const response = await fetch("http://localhost/project_41970137_vues/php_api/show_customer.php");
+        const response = await fetch("http://localhost/project_41970137_vues/php_api/show_customer.php", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+
         if (!response.ok) {
           throw new Error("ไม่สามารถดึงข้อมูลได้");
         }
-        customers.value = await response.json();
+
+        const result = await response.json();
+        if (result.success) {
+          customers.value = result.data;
+        } else {
+          error.value = result.message;
+        }
+
       } catch (err) {
         error.value = err.message;
       } finally {

@@ -1,109 +1,69 @@
 <template>
-  <div class="container mt-4">
-    <h2>เพิ่มลูกค้าใหม่</h2>
-
-    <!-- Form เพิ่มลูกค้า -->
-    <form @submit.prevent="submitForm" class="mt-3">
-      <div class="mb-3">
-        <label class="form-label">ชื่อ</label>
-        <input type="text" class="form-control" v-model="firstName" required />
+  <div class="container mt-4 col-md-4 bg-body-secondary ">
+    <h2 class="text-center mb-3">ลงทะเบียน</h2>
+    <form @submit.prevent="addCustomer">
+      <div class="mb-2">
+        <input v-model="customer.firstName" class="form-control" placeholder="ชื่อ" required />
       </div>
-
-      <div class="mb-3">
-        <label class="form-label">นามสกุล</label>
-        <input type="text" class="form-control" v-model="lastName" required />
+      <div class="mb-2">
+        <input v-model="customer.lastName" class="form-control" placeholder="นามสกุล" required />
       </div>
-
-      <div class="mb-3">
-        <label class="form-label">เบอร์โทร</label>
-        <input type="text" class="form-control" v-model="phone" required />
+      <div class="mb-2">
+        <input  v-model="customer.phone" class="form-control" placeholder="เบอร์โทร" required />
       </div>
-
-      <div class="mb-3">
-        <label class="form-label">ชื่อผู้ใช้</label>
-        <input type="text" class="form-control" v-model="username" required />
+      <div class="mb-2">
+        <input v-model="customer.username" class="form-control" placeholder="ชื่อผู้ใช้" required />
       </div>
-
-      <div class="mb-3">
-        <label class="form-label">รหัสผ่าน</label>
-        <input type="password" class="form-control" v-model="password" required />
+      <div class="mb-2">
+        <input type="password" v-model="customer.password" class="form-control" placeholder="รหัสผ่าน" required />
       </div>
-
-      <button type="submit" class="btn btn-primary">เพิ่มลูกค้า</button>
+      <div class="text-center mt-4 ">
+      <button type="submit" class="btn btn-primary mb-4">บันทึก</button> &nbsp;
+      <button type="reset" class="btn btn-secondary mb-4">ยกเลิก</button>
+      </div>
     </form>
 
-    <!-- แสดงผลลัพธ์ -->
-    <div v-if="successMessage" class="alert alert-success mt-3">{{ successMessage }}</div>
-    <div v-if="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
+    <div v-if="message" class="alert alert-info mt-3">
+      {{ message }}
+    </div>
   </div>
 </template>
 
+
 <script>
-import { ref } from "vue";
-
 export default {
-  name: "AddCustomer",
-  setup() {
-    // ตัวแปรเก็บข้อมูลจากฟอร์ม
-    const firstName = ref("");
-    const lastName = ref("");
-    const phone = ref("");
-    const username = ref("");
-    const password = ref("");
-
-    // ตัวแปรแสดงผลลัพธ์
-    const successMessage = ref("");
-    const errorMessage = ref("");
-
-    // ฟังก์ชันส่งข้อมูลไป API
-    const submitForm = async () => {
-      successMessage.value = "";
-      errorMessage.value = "";
-
-      const newCustomer = {
-        firstName: firstName.value,
-        lastName: lastName.value,
-        phone: phone.value,
-        username: username.value,
-        password: password.value
-      };
-
+  data() {
+    return {
+      customer: {
+        firstName: "",
+        lastName: "",
+        phone: "",
+        username: "",
+        password: ""
+      },
+      message: ""
+    };
+  },
+  methods: {
+    async addCustomer() {
       try {
-        const response = await fetch("http://localhost/project_41970137_vues/php_api/add_customer.php", {
+        const res = await fetch("http://localhost/project_41970137_vues/php_api/add_customer.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newCustomer)
+          body: JSON.stringify(this.customer)
         });
+        const data = await res.json();
+        this.message = data.message;
 
-        const result = await response.json();
-
-        if (result.success) {
-          successMessage.value = "เพิ่มลูกค้าสำเร็จ! ID: " + result.customer_id;
-
-          // ล้างฟอร์ม
-          firstName.value = "";
-          lastName.value = "";
-          phone.value = "";
-          username.value = "";
-          password.value = "";
-        } else {
-          errorMessage.value = result.error || "เกิดข้อผิดพลาด";
+        if (data.success) {
+          // ✅ เคลียร์ข้อมูลใน textbox หลังบันทึกสำเร็จ
+          this.customer = { firstName: "", lastName: "", phone: "", username: "", password: "" };
         }
-      } catch (err) {
-        errorMessage.value = err.message;
-      }
-    };
 
-    return {
-      firstName,
-      lastName,
-      phone,
-      username,
-      password,
-      successMessage,
-      errorMessage,
-      submitForm
-    };
+      } catch (err) {
+        this.message = "เกิดข้อผิดพลาด: " + err.message;
+      }
+    }
   }
-};
+}
 </script>
