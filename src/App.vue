@@ -16,6 +16,9 @@
         <li class="nav-item">
                   <a class="nav-link" href="/products">Product</a>
         </li>
+         <li class="nav-item">
+                  <a class="nav-link" href="/sh_product">SH_Product</a>
+        </li>
         <li class="nav-item">
                   <a class="nav-link" href="/customer">Customer</a>
         </li>

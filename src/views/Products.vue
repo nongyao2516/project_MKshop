@@ -27,8 +27,8 @@
           <td>{{ product.stock }}</td>
           <td>
             <!-- แสดงรูปภาพสินค้า -->
-            <img :src="'http://localhost/project_41970137_week3/php_api/uploads/' + product.image" width="100" />
-
+            <img :src="'http://localhost/project_41970137_week3/php_api/uploads/' + product.image" width="100" /> 
+    
           </td>
         </tr>
       </tbody>
@@ -50,11 +50,12 @@
 import { ref, onMounted } from "vue";
 
 export default {
-  name: "CustomerList",
+  name: "ProductList",
   setup() {
     const products = ref([]);
     const loading = ref(true);
     const error = ref(null);
+
 
     // ฟังก์ชันดึงข้อมูลจาก API ด้วย GET
     const fetchProducts = async () => {

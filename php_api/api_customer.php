@@ -1,14 +1,9 @@
 <?php
+
 // เชื่อมต่อฐานข้อมูล
 include 'condb.php';
 
-// ตั้ง header สำหรับ JSON และ CORS
-/*header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization"); */
-
-// จัดการ preflight request สำหรับ CORS
+// ✅ จัดการ Preflight request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
@@ -20,15 +15,18 @@ try {
     $method = $_SERVER['REQUEST_METHOD'];
 
     if ($method === "GET") {
-        // ดึงข้อมูลลูกค้าทั้งหมด
-        $stmt = $conn->prepare("SELECT * FROM customers ORDER BY customer_id DESC");
+        // 👉 ดึงข้อมูลลูกค้าทั้งหมด
+        $stmt = $conn->prepare("SELECT * FROM customers ORDER BY customer_id ASC");
         $stmt->execute();
         $response["success"] = true;
         $response["data"] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } 
-    elseif ($method === "POST") {
-        // เพิ่มลูกค้าใหม่
-        $input = $_POST; // หรือ $_POST ถ้า form-data
+
+    } elseif ($method === "POST") {
+        // 👉 เพิ่มลูกค้าใหม่
+        $input = json_decode(file_get_contents("php://input"), true);
+        if (!$input) {
+            $input = $_POST; // fallback ถ้าเป็น form-data
+        }
 
         if (isset($input["firstName"], $input["lastName"], $input["phone"], $input["username"], $input["password"])) {
             $firstName = $input["firstName"];
@@ -44,17 +42,20 @@ try {
                 $response["success"] = true;
                 $response["message"] = "Customer added successfully";
             } else {
-                $response["message"] = "Error adding customer";
+                $errorInfo = $stmt->errorInfo();
+                $response["message"] = "Error adding customer: " . $errorInfo[2];
             }
         } else {
             $response["message"] = "Missing required fields";
         }
-    } 
-    else {
+
+    } else {
         $response["message"] = "Method not supported";
     }
+
 } catch (PDOException $e) {
     $response["message"] = "Database error: " . $e->getMessage();
 }
 
+// ✅ ส่งกลับ JSON
 echo json_encode($response);
