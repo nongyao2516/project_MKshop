@@ -14,7 +14,7 @@
           <a class="nav-link" href="/showproduct">Show Product</a>
         </li>
         <li class="nav-item">
-                  <a class="nav-link" href="/products">Product</a>
+                  <a class="nav-link" href="/AddProduct">ADD Product</a>
         </li>
          <li class="nav-item">
                   <a class="nav-link" href="/sh_product">SH_Product</a>
