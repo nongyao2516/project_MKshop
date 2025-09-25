@@ -1,61 +1,72 @@
 <?php
-
 // เชื่อมต่อฐานข้อมูล
 include 'condb.php';
 
-// ✅ จัดการ Preflight request
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
-
-$response = ["success" => false, "data" => [], "message" => ""];
+header("Content-Type: application/json; charset=UTF-8");
 
 try {
     $method = $_SERVER['REQUEST_METHOD'];
 
     if ($method === "GET") {
-        // 👉 ดึงข้อมูลลูกค้าทั้งหมด
-        $stmt = $conn->prepare("SELECT * FROM customers ORDER BY customer_id ASC");
+        // ✅ ดึงข้อมูลลูกค้าทั้งหมด
+        $stmt = $conn->prepare("SELECT customer_id, firstName, lastName, phone, username FROM customers ORDER BY customer_id DESC");
         $stmt->execute();
-        $response["success"] = true;
-        $response["data"] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    } elseif ($method === "POST") {
-        // 👉 เพิ่มลูกค้าใหม่
-        $input = json_decode(file_get_contents("php://input"), true);
-        if (!$input) {
-            $input = $_POST; // fallback ถ้าเป็น form-data
-        }
+        echo json_encode(["success" => true, "data" => $result]);
+    }
+//เพิ่มข้อมูล
+elseif ($method === "POST") {
+        // ✅ เพิ่มข้อมูลลูกค้าใหม่
+        $data = json_decode(file_get_contents("php://input"), true);
 
-        if (isset($input["firstName"], $input["lastName"], $input["phone"], $input["username"], $input["password"])) {
-            $firstName = $input["firstName"];
-            $lastName  = $input["lastName"];
-            $phone     = $input["phone"];
-            $username  = $input["username"];
-            $password  = password_hash($input["password"], PASSWORD_BCRYPT);
+        $password_01  = password_hash($data["password"], PASSWORD_BCRYPT);  //เข้ารหัส password 
 
-            $stmt = $conn->prepare("INSERT INTO customers (firstName, lastName, phone, username, password) VALUES (?, ?, ?, ?, ?)");
-            $result = $stmt->execute([$firstName, $lastName, $phone, $username, $password]);
+        $stmt = $conn->prepare("INSERT INTO customers (firstName, lastName, phone, username,password) 
+                                VALUES (:firstName, :lastName, :phone, :username, :password)");
 
-            if ($result) {
-                $response["success"] = true;
-                $response["message"] = "Customer added successfully";
-            } else {
-                $errorInfo = $stmt->errorInfo();
-                $response["message"] = "Error adding customer: " . $errorInfo[2];
-            }
+        $stmt->bindParam(":firstName", $data["firstName"]);
+        $stmt->bindParam(":lastName", $data["lastName"]);
+        $stmt->bindParam(":phone", $data["phone"]);
+        $stmt->bindParam(":username", $data["username"]);
+        $stmt->bindParam(":password",  $password_01);
+
+        if ($stmt->execute()) {
+            echo json_encode(["success" => true, "message" => "เพิ่มข้อมูลเรียบร้อย"]);
         } else {
-            $response["message"] = "Missing required fields";
+            echo json_encode(["success" => false, "message" => "ไม่สามารถเพิ่มข้อมูลได้"]);
         }
-
-    } else {
-        $response["message"] = "Method not supported";
     }
 
-} catch (PDOException $e) {
-    $response["message"] = "Database error: " . $e->getMessage();
+
+//ลบข้อมูล
+    elseif ($method === "DELETE") {
+        // ✅ ลบข้อมูลลูกค้าตาม customer_id
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        if (!isset($data["customer_id"])) {
+            echo json_encode(["success" => false, "message" => "ไม่พบค่า customer_id"]);
+            exit;
+        }
+
+        $customer_id = intval($data["customer_id"]);
+
+        $stmt = $conn->prepare("DELETE FROM customers WHERE customer_id = :id");
+        $stmt->bindParam(":id", $customer_id, PDO::PARAM_INT);
+
+        if ($stmt->execute()) {
+            echo json_encode(["success" => true, "message" => "ลบข้อมูลเรียบร้อย"]);
+        } else {
+            echo json_encode(["success" => false, "message" => "ไม่สามารถลบข้อมูลได้"]);
+        }
+    }
+
+    else {
+        echo json_encode(["success" => false, "message" => "Method ไม่ถูกต้อง"]);
+    }
+
+} catch (Exception $e) {
+    echo json_encode(["success" => false, "message" => $e->getMessage()]);
 }
 
-// ✅ ส่งกลับ JSON
-echo json_encode($response);
+?>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 18, 2025 at 09:31 AM
+-- Generation Time: Sep 25, 2025 at 10:22 AM
 -- Server version: 10.4.25-MariaDB
 -- PHP Version: 8.0.23
 
@@ -41,20 +41,9 @@ CREATE TABLE `customers` (
 --
 
 INSERT INTO `customers` (`customer_id`, `firstName`, `lastName`, `phone`, `username`, `password`) VALUES
-(16, 'มานะ', 'ดีใจ', '038743690', 'mana', '$2y$10$a/QExybkIKpUhPKC31565.cGz4HNcneb.iuYfkR/OLHXraAvdK0cO'),
-(17, 'มะลิรัตน์', 'คนดี', '038475820', 'mali', '$2y$10$LhcejD2YFJl8nvfsO/1rducc0L1a2gKxJVTPZzpUyzS3JDSKcnlje'),
-(18, 'สมหญิง', 'มีใจ', '0817458211', 'som', '$2y$10$CzI.b9IwcXToX.PMCa1.u.bVz.cDO9eG8XigjsNOYHaz3eIeLwN3u'),
-(21, 'sdfs', 'dsfs', '3423', 'wer', '$2y$10$KrHBp/dg72coKlHoU//FOOuz2BwudE0RTNFcCXc4HqoZf2uvcPf1G'),
-(22, 'sad', 'sd', '23421', 'sda', '$2y$10$sXCKukAcAKtT87V3ojB6XeVNJp0REaJnZZ0QuLr329dLDP9vyv.HG'),
-(23, 'sad', 'sda', '242', 'sd', '$2y$10$gmNk/nvntgqmsFJLMGNVe.9gnzE6dESiy1a3FYZZ/Ig7ELy6ZR92C'),
-(24, 'dsf', 'dsf', '21321', 'we', '$2y$10$j79s8s0n3FZNHhES16XlvuX.JYJHN0whFSJxXCcJ6c9Ru3etgbRYC'),
-(25, 'asd', 'dsa', '2342', 'wer', '$2y$10$c7fVF67FEWz.KojxlzQtGO6Z/mdw5gykDLlMBC2PbdYZAqf20g.pu'),
-(26, 'ำไพไ', 'ำไพ', '13213', 'ำไพไ', '$2y$10$ZT.YnxbPFZjv6ogBmHYhPeJ49iMJ9StbhcTYd/L/.QphRvicOX8ke'),
-(27, 'sdfs', 'dfs', '342', 'ewr', '$2y$10$AFXUbmisFSTCBrNntBwYLOAKPFU9HsHaqElRhAw6716OdzdQwY6Aa'),
-(28, 'ำไพ', 'ำพไ', '2342', 'ewr', '$2y$10$nxQWocaWYS6NtLL9X/80mu3xv8i9.5BQ1kpgmheZdmpl1ZtwCJ2.6'),
-(29, 'dsf', 'fds', '2342', 'ewr', '$2y$10$00BCarcFjZBFs1F9hYrto.KldH05QBmSvsxZAognZGP19CrEw71qG'),
-(30, 'สมาน ', 'มีตา', '038745820', 'sman', '$2y$10$B6hyHKvi8ZEJpRq5TNbsQe1Id8tiiwcPuBof3YiYYGRpNq4RnZplu'),
-(31, 'sdfds', 'dsfs', '32423', 'dfs', '$2y$10$w38g45G2Dqcf804kWw/z/.I1iHyKDsOqu5acLga7/y8mtkytO1jHK');
+(27, 'มานะ', 'ใจดี', '03873690', 'mana', '$2y$10$AFXUbmisFSTCBrNntBwYLOAKPFU9HsHaqElRhAw6716OdzdQwY6Aa'),
+(36, 'มานี', 'ดีใจ', '0817542100', 'manee', '$2y$10$uSY7ZBo02Bhc9KDG0CFdG.NXVcDv69ZIXXG3NSpojVmIPmBoelefK'),
+(37, 'มะลิร้ตน์', 'เกิดดี', '038743910', 'mali', '$2y$10$TFuV2F6DzYJC.NI6i3hbv.M2QpAPYzkVhuwNL7YwzPccGxDZvj.da');
 
 -- --------------------------------------------------------
 
@@ -126,7 +115,10 @@ INSERT INTO `products` (`product_id`, `product_name`, `description`, `price`, `i
 (10, 'ชุด 2 ลูกชิ้น + หมูสามชั้น', 'ชุด 2 ลูกชิ้น + หมูสามชั้น', '199.00', '1758077915_p6.jpg', 20, '2025-09-17 02:58:35'),
 (11, 'สันคอหมูรวมผัก', 'ชุด 3 สันคอหมูรวมผัก', '220.00', '1758077984_p7.jpg', 20, '2025-09-17 02:59:44'),
 (12, 'การพัฒนาเว็บด้วย HTML', 'หนังสือสอนการพัฒนาเว็บไซต์ด้วย HTML', '299.00', '1758082138_eq_630ccad48e57c.jpg', 20, '2025-09-17 04:08:58'),
-(13, 'ชาบูน้ำดำ หมู ผักสด', 'ชุด 5 ชาบูน้ำดำ หมู ผักสด', '250.00', '1758082507_p3.jpg', 20, '2025-09-17 04:15:07');
+(13, 'ชาบูน้ำดำ หมู ผักสด', 'ชุด 5 ชาบูน้ำดำ หมู ผักสด', '250.00', '1758082507_p3.jpg', 20, '2025-09-17 04:15:07'),
+(14, 'ชุดรวมมิตรชาบู', 'รวมมิตร หมู ลูกชิ้น ผักสด', '299.00', '1758180812_p1.jpg', 20, '2025-09-18 07:33:32'),
+(15, 'Galaxy Note', 'หนังสือสอนใช้งาน Galaxy Note', '250.00', '1758181345_eq_630ccb3cc1614.jpg', 20, '2025-09-18 07:42:25'),
+(16, 'sad', 'sada', '234.00', '1758771581_eq_63726042c7896.png', 23, '2025-09-25 03:39:41');
 
 --
 -- Indexes for dumped tables
@@ -170,7 +162,7 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT for table `orderdetails`
@@ -194,7 +186,7 @@ ALTER TABLE `payments`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
