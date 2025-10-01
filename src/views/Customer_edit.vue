@@ -27,7 +27,7 @@
           <td>{{ customer.phone }}</td>
           <td>{{ customer.username }}</td>
           <td>
-            <!-- ปุ่มแก้ไข -->
+            <!-- เพิ่ม ปุ่มแก้ไข -->
             <button class="btn btn-warning btn-sm" @click="openEditModal(customer)">แก้ไข</button>
           </td>
           <td>
@@ -48,7 +48,7 @@
       {{ error }}
     </div>
 
-    <!-- Modal แก้ไขข้อมูล -->
+    <!-- เพิ่ม Modal แก้ไขข้อมูล -->
     <div class="modal fade" id="editModal" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -74,6 +74,10 @@
                 <label class="form-label">ชื่อผู้ใช้</label>
                 <input v-model="editCustomer.username" type="text" class="form-control" required>
               </div>
+              <div class="mb-3">
+                <label class="form-label">รหัสผ่าน (เว้นว่างหากไม่เปลี่ยน)</label>
+                <input v-model="editCustomer.password" type="password" class="form-control">
+              </div>
               <button type="submit" class="btn btn-success">บันทึก</button>
             </form>
           </div>
@@ -87,7 +91,7 @@
 
 <script>
 import { ref, onMounted } from "vue";
-import { Modal } from "bootstrap";   // ✅ import Modal class
+import { Modal } from "bootstrap";   // เพิ่ม ✅ import Modal class
 
 export default {
   name: "CustomerList",
@@ -95,8 +99,8 @@ export default {
     const customers = ref([]);
     const loading = ref(true);
     const error = ref(null);
-    const editCustomer = ref({});
-    let editModal;
+    const editCustomer = ref({});   //เพิ่ม
+    let editModal;                  //เพิ่ม
 
     const fetchCustomers = async () => {
       try {
@@ -122,15 +126,15 @@ export default {
 
     onMounted(() => {
       fetchCustomers();
-      const modalEl = document.getElementById("editModal");
-      editModal = new Modal(modalEl);   // ✅ ใช้ Modal ที่ import มา
+      const modalEl = document.getElementById("editModal");     //เพิ่ม
+      editModal = new Modal(modalEl);   // เพิ่ม ✅ ใช้ Modal ที่ import มา
     });
-
+//เพิ่ม เปิด Popup Modal ***
     const openEditModal = (customer) => {
       editCustomer.value = { ...customer };
       editModal.show();
     };
-
+// เพิ่มฟังก์ชั่นการแก้ไขข้อมูล ***
     const updateCustomer = async () => {
       try {
         const response = await fetch("http://localhost/project_41970137_week3/php_api/api_customer.php", {
@@ -155,6 +159,7 @@ export default {
       }
     };
 
+//ฟังก์ชั่นการลบข้อมูล ***
     const deleteCustomer = async (id) => {
       if (!confirm("คุณต้องการลบข้อมูลนี้ใช่หรือไม่?")) return;
 
@@ -183,9 +188,10 @@ export default {
       loading,
       error,
       deleteCustomer,
-      editCustomer,
-      openEditModal,
-      updateCustomer
+      
+      editCustomer,  //เพิ่ม
+      openEditModal,  //เพิ่ม
+      updateCustomer  //เพิ่ม
     };
   }
 };

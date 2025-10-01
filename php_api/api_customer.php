@@ -9,7 +9,7 @@ try {
 
     if ($method === "GET") {
         // ✅ ดึงข้อมูลลูกค้าทั้งหมด
-        $stmt = $conn->prepare("SELECT customer_id, firstName, lastName, phone, username FROM customers ORDER BY customer_id DESC");
+        $stmt = $conn->prepare("SELECT customer_id, firstName, lastName,phone,username FROM customers ORDER BY customer_id DESC");
         $stmt->execute();
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -38,17 +38,40 @@ try {
         }
     }
 
-    // ✅ แก้ไขข้อมูล
-    elseif ($method === "PUT") {
-        $data = json_decode(file_get_contents("php://input"), true);
+   
+// ✅ แก้ไขข้อมูล
+elseif ($method === "PUT") {
+    $data = json_decode(file_get_contents("php://input"), true);
 
-        if (!isset($data["customer_id"])) {
-            echo json_encode(["success" => false, "message" => "ไม่พบค่า customer_id"]);
-            exit;
-        }
+    if (!isset($data["customer_id"])) {
+        echo json_encode(["success" => false, "message" => "ไม่พบค่า customer_id"]);
+        exit;
+    }
 
-        $customer_id = intval($data["customer_id"]);
+    $customer_id = intval($data["customer_id"]);
 
+    // ตรวจสอบว่ามีการส่ง password มาไหม
+    if (!empty($data["password"])) {
+        // เข้ารหัสรหัสผ่านใหม่
+        $password_01 = password_hash($data["password"], PASSWORD_BCRYPT);
+
+        $stmt = $conn->prepare("UPDATE customers 
+                                SET firstName = :firstName, 
+                                    lastName = :lastName, 
+                                    phone = :phone, 
+                                    username = :username,
+                                    password = :password
+                                WHERE customer_id = :id");
+
+        $stmt->bindParam(":firstName", $data["firstName"]);
+        $stmt->bindParam(":lastName", $data["lastName"]);
+        $stmt->bindParam(":phone", $data["phone"]);
+        $stmt->bindParam(":username", $data["username"]);
+        $stmt->bindParam(":password", $password_01);
+        $stmt->bindParam(":id", $customer_id, PDO::PARAM_INT);
+
+    } else {
+        // กรณีไม่ได้แก้ไข password
         $stmt = $conn->prepare("UPDATE customers 
                                 SET firstName = :firstName, 
                                     lastName = :lastName, 
@@ -61,13 +84,14 @@ try {
         $stmt->bindParam(":phone", $data["phone"]);
         $stmt->bindParam(":username", $data["username"]);
         $stmt->bindParam(":id", $customer_id, PDO::PARAM_INT);
-
-        if ($stmt->execute()) {
-            echo json_encode(["success" => true, "message" => "แก้ไขข้อมูลเรียบร้อย"]);
-        } else {
-            echo json_encode(["success" => false, "message" => "ไม่สามารถแก้ไขข้อมูลได้"]);
-        }
     }
+
+    if ($stmt->execute()) {
+        echo json_encode(["success" => true, "message" => "แก้ไขข้อมูลเรียบร้อย"]);
+    } else {
+        echo json_encode(["success" => false, "message" => "ไม่สามารถแก้ไขข้อมูลได้"]);
+    }
+}
 
     // ✅ ลบข้อมูล
     elseif ($method === "DELETE") {
