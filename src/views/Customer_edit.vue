@@ -15,8 +15,8 @@
           <th>นามสกุล</th>
           <th>เบอร์โทร</th>
           <th>ชื่อผู้ใช้</th>
-          <th>แก้ไข</th>
-          <th>ลบ</th>
+          <th>แก้ไข/ลบ</th>
+          
         </tr>
       </thead>
       <tbody>
@@ -28,9 +28,7 @@
           <td>{{ customer.username }}</td>
           <td>
             <!-- เพิ่ม ปุ่มแก้ไข -->
-            <button class="btn btn-warning btn-sm" @click="openEditModal(customer)">แก้ไข</button>
-          </td>
-          <td>
+            <button class="btn btn-warning btn-sm" @click="openEditModal(customer)">แก้ไข</button> |      
             <!-- ปุ่มลบ -->
             <button class="btn btn-danger btn-sm" @click="deleteCustomer(customer.customer_id)">ลบ</button>
           </td>

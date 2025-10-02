@@ -60,7 +60,7 @@ export default {
     // ฟังก์ชันดึงข้อมูลจาก API ด้วย GET
     const fetchProducts = async () => {
       try {
-        const response = await fetch("http://localhost/project_41970137_week3/php_api/show_product.php", {
+        const response = await fetch("http://localhost/project_41970137_week3/php_api/api_product.php", {
           method: "GET",
           headers: {
             "Content-Type": "application/json"

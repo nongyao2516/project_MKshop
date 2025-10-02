@@ -3,16 +3,16 @@
     <h2 class="text-center mb-3">เพิ่มสินค้า</h2>
     <form @submit.prevent="addProduct">
       <div class="mb-2">
-        <input v-model="product.product_name" class="form-control" placeholder="ชื่อสินค้า" required />
+        <input type="text" v-model="product.product_name" class="form-control" placeholder="ชื่อสินค้า" required />
       </div>
       <div class="mb-2">
-        <input v-model="product.description" class="form-control" placeholder="รายละเอียด" required />
+        <textarea v-model="product.description" class="form-control" placeholder="รายละเอียด" rows="3" required></textarea>
       </div>
       <div class="mb-2">
-        <input  v-model="product.price" class="form-control" placeholder="ราคา" required />
+        <input type="number" v-model="product.price" class="form-control" placeholder="ราคา" required />
       </div>
       <div class="mb-2">
-        <input v-model="product.stock" class="form-control" placeholder="จำนวน" required />
+        <input type="number" v-model="product.stock" class="form-control" placeholder="จำนวน" required />
       </div>
       <div class="mb-2">
      <!-- ใช้ @change อ่านไฟล์ -->
