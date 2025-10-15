@@ -6,7 +6,6 @@
       <a class="btn btn-primary" href="/add_customer" role="button">Add+</a>
     </div>
 
-    <!-- ตารางแสดงข้อมูลลูกค้า -->
     <table class="table table-bordered table-striped">
       <thead class="table-primary">
         <tr>
@@ -16,7 +15,6 @@
           <th>เบอร์โทร</th>
           <th>ชื่อผู้ใช้</th>
           <th>แก้ไข/ลบ</th>
-          
         </tr>
       </thead>
       <tbody>
@@ -27,26 +25,17 @@
           <td>{{ customer.phone }}</td>
           <td>{{ customer.username }}</td>
           <td>
-            <!-- เพิ่ม ปุ่มแก้ไข -->
-            <button class="btn btn-warning btn-sm" @click="openEditModal(customer)">แก้ไข</button> |      
-            <!-- ปุ่มลบ -->
+            <button class="btn btn-warning btn-sm" @click="openEditModal(customer)">แก้ไข</button> |
             <button class="btn btn-danger btn-sm" @click="deleteCustomer(customer.customer_id)">ลบ</button>
           </td>
         </tr>
       </tbody>
     </table>
 
-    <!-- Loading -->
-    <div v-if="loading" class="text-center">
-      <p>กำลังโหลดข้อมูล...</p>
-    </div>
+    <div v-if="loading" class="text-center"><p>กำลังโหลดข้อมูล...</p></div>
+    <div v-if="error" class="alert alert-danger">{{ error }}</div>
 
-    <!-- Error -->
-    <div v-if="error" class="alert alert-danger">
-      {{ error }}
-    </div>
-
-    <!-- เพิ่ม Modal แก้ไขข้อมูล -->
+    <!-- Modal แก้ไข -->
     <div class="modal fade" id="editModal" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -82,14 +71,11 @@
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
-
 <script>
 import { ref, onMounted } from "vue";
-import { Modal } from "bootstrap";   // เพิ่ม ✅ import Modal class
 
 export default {
   name: "CustomerList",
@@ -97,19 +83,14 @@ export default {
     const customers = ref([]);
     const loading = ref(true);
     const error = ref(null);
-    const editCustomer = ref({});   //เพิ่ม
-    let editModal;                  //เพิ่ม
+    const editCustomer = ref({});
+    let editModal = null;
 
     const fetchCustomers = async () => {
       try {
-        const response = await fetch("http://localhost/project_41970137_week3/php_api/api_customer.php", {
-          method: "GET",
-          headers: { "Content-Type": "application/json" }
-        });
-
-        if (!response.ok) throw new Error("ไม่สามารถดึงข้อมูลได้");
-
+        const response = await fetch("http://localhost/project_41970137_week3/php_api/api_customer.php");
         const result = await response.json();
+
         if (result.success) {
           customers.value = result.data;
         } else {
@@ -124,15 +105,15 @@ export default {
 
     onMounted(() => {
       fetchCustomers();
-      const modalEl = document.getElementById("editModal");     //เพิ่ม
-      editModal = new Modal(modalEl);   // เพิ่ม ✅ ใช้ Modal ที่ import มา
+      const modalEl = document.getElementById("editModal");
+      editModal = new window.bootstrap.Modal(modalEl); // ✅ ใช้ Bootstrap จาก main.js
     });
-//เพิ่ม เปิด Popup Modal ***
+
     const openEditModal = (customer) => {
       editCustomer.value = { ...customer };
       editModal.show();
     };
-// เพิ่มฟังก์ชั่นการแก้ไขข้อมูล ***
+
     const updateCustomer = async () => {
       try {
         const response = await fetch("http://localhost/project_41970137_week3/php_api/api_customer.php", {
@@ -140,13 +121,11 @@ export default {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(editCustomer.value)
         });
-
         const result = await response.json();
 
         if (result.success) {
           const index = customers.value.findIndex(c => c.customer_id === editCustomer.value.customer_id);
           if (index !== -1) customers.value[index] = { ...editCustomer.value };
-
           alert("แก้ไขข้อมูลสำเร็จ");
           editModal.hide();
         } else {
@@ -157,19 +136,15 @@ export default {
       }
     };
 
-//ฟังก์ชั่นการลบข้อมูล ***
     const deleteCustomer = async (id) => {
       if (!confirm("คุณต้องการลบข้อมูลนี้ใช่หรือไม่?")) return;
-
       try {
         const response = await fetch("http://localhost/project_41970137_week3/php_api/api_customer.php", {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ customer_id: id })
         });
-
         const result = await response.json();
-
         if (result.success) {
           customers.value = customers.value.filter(c => c.customer_id !== id);
           alert(result.message);
@@ -185,11 +160,10 @@ export default {
       customers,
       loading,
       error,
-      deleteCustomer,
-      
-      editCustomer,  //เพิ่ม
-      openEditModal,  //เพิ่ม
-      updateCustomer  //เพิ่ม
+      editCustomer,
+      openEditModal,
+      updateCustomer,
+      deleteCustomer
     };
   }
 };

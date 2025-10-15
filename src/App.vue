@@ -29,7 +29,9 @@
         <li class="nav-item">
                   <a class="nav-link" href="/customer">Customer</a>
         </li>
-
+<li class="nav-item">
+                  <a class="nav-link" href="/customer_edit">Customer Edit</a>
+        </li>
         <li class="nav-item">
                   <a class="nav-link" href="/employee">Employee</a>
         </li>

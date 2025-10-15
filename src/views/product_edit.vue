@@ -26,11 +26,18 @@
           <td>{{ product.price }}</td>
           <td>{{ product.stock }}</td>
           <td>
-            <img :src="'http://localhost/project_41970137_week3/php_api/uploads/' + product.image" width="100" />
+            <img
+              :src="'http://localhost/project_41970137_week3/php_api/uploads/' + product.image"
+              width="100"
+            />
           </td>
           <td>
-            <button class="btn btn-warning btn-sm me-2" @click="openEditModal(product)">แก้ไข</button>
-            <button class="btn btn-danger btn-sm" @click="deleteProduct(product.product_id)">ลบ</button>
+            <button class="btn btn-warning btn-sm me-2" @click="openEditModal(product)">
+              แก้ไข
+            </button>
+            <button class="btn btn-danger btn-sm" @click="deleteProduct(product.product_id)">
+              ลบ
+            </button>
           </td>
         </tr>
       </tbody>
@@ -70,7 +77,10 @@
                 <input type="file" @change="handleFileUpload" class="form-control" />
                 <div v-if="editForm.image">
                   <p class="mt-2">รูปเดิม:</p>
-                  <img :src="'http://localhost/project_41970137_week3/php_api/uploads/' + editForm.image" width="100" />
+                  <img
+                    :src="'http://localhost/project_41970137_week3/php_api/uploads/' + editForm.image"
+                    width="100"
+                  />
                 </div>
               </div>
               <button type="submit" class="btn btn-success">บันทึกการแก้ไข</button>
@@ -84,7 +94,6 @@
 
 <script>
 import { ref, onMounted } from "vue";
-import { Modal } from "bootstrap";
 
 export default {
   name: "ProductList",
@@ -92,7 +101,6 @@ export default {
     const products = ref([]);
     const loading = ref(true);
     const error = ref(null);
-
     const editForm = ref({
       product_id: null,
       product_name: "",
@@ -104,6 +112,7 @@ export default {
     const newImageFile = ref(null);
     let modalInstance = null;
 
+    // โหลดข้อมูลสินค้า
     const fetchProducts = async () => {
       try {
         const res = await fetch("http://localhost/project_41970137_week3/php_api/api_product.php");
@@ -116,11 +125,12 @@ export default {
       }
     };
 
+    // เปิด Modal แก้ไข
     const openEditModal = (product) => {
       editForm.value = { ...product };
       newImageFile.value = null;
       const modalEl = document.getElementById("editModal");
-      modalInstance = new Modal(modalEl);
+      modalInstance = new window.bootstrap.Modal(modalEl); // ✅ ใช้ bootstrap จาก main.js
       modalInstance.show();
     };
 
@@ -128,6 +138,7 @@ export default {
       newImageFile.value = event.target.files[0];
     };
 
+    // อัปเดตสินค้า
     const updateProduct = async () => {
       const formData = new FormData();
       formData.append("action", "update");
@@ -136,9 +147,7 @@ export default {
       formData.append("description", editForm.value.description);
       formData.append("price", editForm.value.price);
       formData.append("stock", editForm.value.stock);
-      if (newImageFile.value) {
-        formData.append("image", newImageFile.value);
-      }
+      if (newImageFile.value) formData.append("image", newImageFile.value);
 
       try {
         const res = await fetch("http://localhost/project_41970137_week3/php_api/api_product.php", {
@@ -158,6 +167,7 @@ export default {
       }
     };
 
+    // ลบสินค้า
     const deleteProduct = async (id) => {
       if (!confirm("คุณแน่ใจหรือไม่ที่จะลบสินค้านี้?")) return;
 
