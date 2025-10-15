@@ -3,7 +3,9 @@
     <h2 class="mb-3">รายชื่อลูกค้า</h2>
     
     <div class="mb-3">
-      <a class="btn btn-primary" href="/add_customer" role="button">Add+</a>
+      <button class="btn btn-primary" @click="openAddModal">
+        Add <i class="bi bi-plus-circle"></i>
+      </button>
     </div>
 
     <table class="table table-bordered table-striped">
@@ -25,8 +27,13 @@
           <td>{{ customer.phone }}</td>
           <td>{{ customer.username }}</td>
           <td>
-            <button class="btn btn-warning btn-sm" @click="openEditModal(customer)">แก้ไข</button> |
-            <button class="btn btn-danger btn-sm" @click="deleteCustomer(customer.customer_id)">ลบ</button>
+            <button class="btn btn-warning btn-sm" @click="openEditModal(customer)">
+              <i class="bi bi-pencil-square"></i>
+            </button>
+            |
+            <button class="btn btn-danger btn-sm" @click="deleteCustomer(customer.customer_id)">
+              <i class="bi bi-trash-fill"></i>
+            </button>
           </td>
         </tr>
       </tbody>
@@ -35,16 +42,16 @@
     <div v-if="loading" class="text-center"><p>กำลังโหลดข้อมูล...</p></div>
     <div v-if="error" class="alert alert-danger">{{ error }}</div>
 
-    <!-- Modal แก้ไข -->
+    <!-- ✅ Modal ใช้ทั้งเพิ่ม/แก้ไข -->
     <div class="modal fade" id="editModal" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">แก้ไขข้อมูลลูกค้า</h5>
+            <h5 class="modal-title">{{ isEditMode ? "แก้ไขข้อมูลลูกค้า" : "เพิ่มลูกค้าใหม่" }}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
-            <form @submit.prevent="updateCustomer">
+            <form @submit.prevent="saveCustomer">
               <div class="mb-3">
                 <label class="form-label">ชื่อ</label>
                 <input v-model="editCustomer.firstName" type="text" class="form-control" required>
@@ -62,15 +69,20 @@
                 <input v-model="editCustomer.username" type="text" class="form-control" required>
               </div>
               <div class="mb-3">
-                <label class="form-label">รหัสผ่าน (เว้นว่างหากไม่เปลี่ยน)</label>
-                <input v-model="editCustomer.password" type="password" class="form-control">
+                <label class="form-label">รหัสผ่าน</label>
+                <input v-model="editCustomer.password" type="password" class="form-control"
+                       :required="!isEditMode"
+                       placeholder="กรอกเฉพาะเมื่อเพิ่มใหม่หรือเปลี่ยนรหัสผ่าน">
               </div>
-              <button type="submit" class="btn btn-success">บันทึก</button>
+              <button type="submit" class="btn btn-success">
+                {{ isEditMode ? "บันทึกการแก้ไข" : "เพิ่มลูกค้า" }}
+              </button>
             </form>
           </div>
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -84,6 +96,7 @@ export default {
     const loading = ref(true);
     const error = ref(null);
     const editCustomer = ref({});
+    const isEditMode = ref(false);
     let editModal = null;
 
     const fetchCustomers = async () => {
@@ -106,27 +119,46 @@ export default {
     onMounted(() => {
       fetchCustomers();
       const modalEl = document.getElementById("editModal");
-      editModal = new window.bootstrap.Modal(modalEl); // ✅ ใช้ Bootstrap จาก main.js
+      editModal = new window.bootstrap.Modal(modalEl);
     });
 
-    const openEditModal = (customer) => {
-      editCustomer.value = { ...customer };
+    // ✅ เปิด Modal เพิ่มลูกค้าใหม่
+    const openAddModal = () => {
+      isEditMode.value = false;
+      editCustomer.value = {
+        firstName: "",
+        lastName: "",
+        phone: "",
+        username: "",
+        password: ""
+      };
       editModal.show();
     };
 
-    const updateCustomer = async () => {
+    // ✅ เปิด Modal แก้ไขลูกค้า
+    const openEditModal = (customer) => {
+      isEditMode.value = true;
+      editCustomer.value = { ...customer, password: "" };
+      editModal.show();
+    };
+
+    // ✅ ใช้ฟังก์ชันเดียวสำหรับทั้งเพิ่ม/แก้ไข
+    const saveCustomer = async () => {
+      const url = "http://localhost/project_41970137_week3/php_api/api_customer.php";
+      const method = isEditMode.value ? "PUT" : "POST";
+
       try {
-        const response = await fetch("http://localhost/project_41970137_week3/php_api/api_customer.php", {
-          method: "PUT",
+        const response = await fetch(url, {
+          method,
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(editCustomer.value)
         });
+
         const result = await response.json();
 
         if (result.success) {
-          const index = customers.value.findIndex(c => c.customer_id === editCustomer.value.customer_id);
-          if (index !== -1) customers.value[index] = { ...editCustomer.value };
-          alert("แก้ไขข้อมูลสำเร็จ");
+          alert(result.message);
+          fetchCustomers();
           editModal.hide();
         } else {
           alert(result.message);
@@ -136,6 +168,7 @@ export default {
       }
     };
 
+    // ✅ ลบลูกค้า
     const deleteCustomer = async (id) => {
       if (!confirm("คุณต้องการลบข้อมูลนี้ใช่หรือไม่?")) return;
       try {
@@ -161,8 +194,10 @@ export default {
       loading,
       error,
       editCustomer,
+      isEditMode,
+      openAddModal,
       openEditModal,
-      updateCustomer,
+      saveCustomer,
       deleteCustomer
     };
   }
