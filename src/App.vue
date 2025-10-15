@@ -24,6 +24,7 @@
           <ul class="dropdown-menu">
              <li><a class="dropdown-item" href="/sh_product">All Product</a></li>
             <li><a class="dropdown-item" href="/product_edit">Product CRUD</a></li>
+            <li><a class="dropdown-item" href="/productList">Product List</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="/AddProduct">Add Product</a></li>
           </ul>
