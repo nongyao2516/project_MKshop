@@ -43,6 +43,12 @@
        <li class="nav-item">
           <a class="nav-link" href="/about">About</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/orders">สรุป Orders</a>
+        </li>
+         <li class="nav-item">
+          <a class="nav-link" href="/show_orders">All Orders</a>
+        </li>
       </ul>
       <form class="d-flex" role="search">
         <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">

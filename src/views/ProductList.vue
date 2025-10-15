@@ -153,6 +153,7 @@ export default {
           product_name: product.product_name,
           price: parseFloat(product.price),
           quantity: 1,
+          
         });
       }
 
@@ -190,48 +191,52 @@ export default {
     );
 
     // ✅ ยืนยันการสั่งซื้อ
-    const submitOrder = async () => {
-      if (!selectedTable.value) {
-        alert("⚠️ กรุณาเลือกโต๊ะก่อนสั่งสินค้า");
-        return;
+ // ✅ ยืนยันการสั่งซื้อ
+const submitOrder = async () => {
+  if (!selectedTable.value) {
+    alert("⚠️ กรุณาเลือกโต๊ะก่อนสั่งสินค้า");
+    return;
+  }
+
+  if (cart.value.length === 0) {
+    alert("⚠️ กรุณาเพิ่มสินค้าในตะกร้าก่อนสั่งซื้อ");
+    return;
+  }
+
+  const orderData = {
+    table_no: selectedTable.value,
+    items: cart.value.map((item) => ({
+      product_id: item.product_id,
+      product_name: item.product_name,
+      quantity: item.quantity,
+      price: item.price,
+    })),
+    total: totalPrice.value,
+  };
+
+  try {
+    const response = await fetch(
+      "http://localhost/project_41970137_week3/php_api/order.php",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderData),
       }
+    );
 
-      if (cart.value.length === 0) {
-        alert("⚠️ กรุณาเพิ่มสินค้าในตะกร้าก่อนสั่งซื้อ");
-        return;
-      }
+    const result = await response.json();
 
-      const orderData = {
-        table_no: selectedTable.value,
-        items: cart.value.map((item) => ({
-          product_id: item.product_id,
-          quantity: item.quantity,
-        })),
-        total: totalPrice.value,
-      };
+    if (result.success) {
+      alert("✅ สั่งซื้อสำเร็จ!");
+      cart.value = []; // ล้างตะกร้า
+    } else {
+      alert("❌ " + result.message);
+    }
+  } catch (error) {
+    alert("เกิดข้อผิดพลาด: " + error.message);
+  }
+};
 
-      try {
-        const response = await fetch(
-          "http://localhost/project_41970137_week3/php_api/order.php",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(orderData),
-          }
-        );
-
-        const result = await response.json();
-
-        if (result.success) {
-          alert("✅ สั่งซื้อสำเร็จ!");
-          cart.value = []; // ล้างตะกร้า
-        } else {
-          alert("❌ " + result.message);
-        }
-      } catch (error) {
-        alert("เกิดข้อผิดพลาด: " + error.message);
-      }
-    };
 
     // โหลดข้อมูลสินค้าทันทีเมื่อหน้าเริ่มต้น
     onMounted(fetchProducts);
