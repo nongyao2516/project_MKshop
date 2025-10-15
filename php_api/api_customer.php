@@ -1,6 +1,6 @@
 <?php
 include 'condb.php';
-header("Content-Type: application/json; charset=UTF-8");
+
 
 try {
     $method = $_SERVER['REQUEST_METHOD'];

@@ -74,16 +74,28 @@
                 <input v-model="editForm.stock" type="number" class="form-control" required />
               </div>
               <div class="mb-3">
-                <label class="form-label">รูปภาพ</label>
-                <input type="file" @change="handleFileUpload" class="form-control" required  />
-                <div v-if="isEditMode && editForm.image">
-                  <p class="mt-2">รูปเดิม:</p>
-                  <img
-                    :src="'http://localhost/project_41970137_week3/php_api/uploads/' + editForm.image"
-                    width="100"
-                  />
-                </div>
-              </div>
+  <label class="form-label">รูปภาพ</label>
+  <!-- ✅ required เฉพาะตอนเพิ่มสินค้า -->
+  <input
+    type="file"
+    @change="handleFileUpload"
+    class="form-control"
+    :required="!isEditMode"
+  />
+
+  <!-- แสดงรูปเดิมเฉพาะตอนแก้ไข -->
+  <div v-if="isEditMode && editForm.image">
+    <p class="mt-2">รูปเดิม:</p>
+    <img
+      :src="'http://localhost/project_41970137_week3/php_api/uploads/' + editForm.image"
+      width="100"
+    />
+  </div>
+</div>
+
+
+
+
               <button type="submit" class="btn btn-success">
                 {{ isEditMode ? "บันทึกการแก้ไข" : "บันทึกสินค้าใหม่" }}
               </button>
@@ -129,7 +141,7 @@ export default {
       }
     };
 
-    // เปิด Modal สำหรับเพิ่มสินค้า
+// เปิด Modal สำหรับเพิ่มสินค้า
 const openAddModal = () => {
   isEditMode.value = false;
   editForm.value = {
@@ -151,7 +163,7 @@ const openAddModal = () => {
   if (fileInput) fileInput.value = "";
  };
 
-    // เปิด Modal สำหรับแก้ไขสินค้า
+// เปิด Modal สำหรับแก้ไขสินค้า
     const openEditModal = (product) => {
       isEditMode.value = true;
       editForm.value = { ...product };
@@ -165,7 +177,7 @@ const openAddModal = () => {
       newImageFile.value = event.target.files[0];
     };
 
-    // ✅ ใช้ฟังก์ชันเดียวในการเพิ่ม / แก้ไข
+// ✅ ใช้ฟังก์ชันเดียวในการเพิ่ม / แก้ไข
     const saveProduct = async () => {
       const formData = new FormData();
       formData.append("action", isEditMode.value ? "update" : "add");
