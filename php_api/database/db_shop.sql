@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 25, 2025 at 10:22 AM
+-- Generation Time: Oct 15, 2025 at 06:40 AM
 -- Server version: 10.4.25-MariaDB
 -- PHP Version: 8.0.23
 
@@ -41,9 +41,12 @@ CREATE TABLE `customers` (
 --
 
 INSERT INTO `customers` (`customer_id`, `firstName`, `lastName`, `phone`, `username`, `password`) VALUES
-(27, 'มานะ', 'ใจดี', '03873690', 'mana', '$2y$10$AFXUbmisFSTCBrNntBwYLOAKPFU9HsHaqElRhAw6716OdzdQwY6Aa'),
-(36, 'มานี', 'ดีใจ', '0817542100', 'manee', '$2y$10$uSY7ZBo02Bhc9KDG0CFdG.NXVcDv69ZIXXG3NSpojVmIPmBoelefK'),
-(37, 'มะลิร้ตน์', 'เกิดดี', '038743910', 'mali', '$2y$10$TFuV2F6DzYJC.NI6i3hbv.M2QpAPYzkVhuwNL7YwzPccGxDZvj.da');
+(36, 'มานะ', 'ใจดี', '03874369', 'mana', '$2y$10$aKsKBq6skVkCWUALjKUr0u0LTqhO07kRtECcReV8KR.33XMlWQqDG'),
+(37, 'มะลิร้ตน์', 'เกิดดี', '038743910', 'mali', '$2y$10$TFuV2F6DzYJC.NI6i3hbv.M2QpAPYzkVhuwNL7YwzPccGxDZvj.da'),
+(40, 'เมษา', 'เด็กดี', '038745260', 'mesa', '$2y$10$qc8K6WsN0Uvvjk1ggaiWqOrs6z/XepMP6/NnaNgJdDH0709ha8BgC'),
+(44, 'สมศรี', 'บุญมาก', '0389759810', 'somchi', '$2y$10$FZ1fzmwD81ic0FoRGgAnPuX9UEyILfVaQ03lguhSOfFmcmUXMMI5W'),
+(47, 'AAA', 'BBB', '038743691', 'AAA', '$2y$10$iPT3FRIlJP/uPhyta9ynieEXjFMRFlIo4N/iiWvOzyn8m1B8I6KRK'),
+(48, 'เมษา', 'เด็กดี', '038743690', 'mesa', '$2y$10$8ejhxNhpF9i4/fXBtKDTrOCVlD6yB/hGGJW7kseu4V5feYMgWnqr6');
 
 -- --------------------------------------------------------
 
@@ -118,7 +121,9 @@ INSERT INTO `products` (`product_id`, `product_name`, `description`, `price`, `i
 (13, 'ชาบูน้ำดำ หมู ผักสด', 'ชุด 5 ชาบูน้ำดำ หมู ผักสด', '250.00', '1758082507_p3.jpg', 20, '2025-09-17 04:15:07'),
 (14, 'ชุดรวมมิตรชาบู', 'รวมมิตร หมู ลูกชิ้น ผักสด', '299.00', '1758180812_p1.jpg', 20, '2025-09-18 07:33:32'),
 (15, 'Galaxy Note', 'หนังสือสอนใช้งาน Galaxy Note', '250.00', '1758181345_eq_630ccb3cc1614.jpg', 20, '2025-09-18 07:42:25'),
-(16, 'sad', 'sada', '234.00', '1758771581_eq_63726042c7896.png', 23, '2025-09-25 03:39:41');
+(16, 'AAAA', 'BBBBB', '500.00', '1760496734_logo-spu.jpg', 24, '2025-09-25 03:39:41'),
+(17, 'ออกแบบเว็บด้วย HTML', 'หนังสือเขียนโปรแกรมด้วย HTML', '299.00', '1760498309_eq_630ccad48e57c.jpg', 25, '2025-10-15 03:18:12'),
+(19, 'กหด2', 'กหด2', '34.00', '1760498776_eq_63724948c175a.jpg', 23, '2025-10-15 03:25:56');
 
 --
 -- Indexes for dumped tables
@@ -162,7 +167,7 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT for table `orderdetails`
@@ -186,7 +191,7 @@ ALTER TABLE `payments`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
