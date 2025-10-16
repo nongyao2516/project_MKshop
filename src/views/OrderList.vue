@@ -30,7 +30,15 @@
           <td>{{ order.table_no }}</td>
           <td>{{ order.items_count }}</td>
           <td>{{ order.total_amount.toFixed(2) }}</td>
-          <td>{{ order.status }}</td>
+          <td>
+            <span
+              v-for="(st, i) in order.status.split(', ')"
+              :key="i"
+              :class="['fw-bold', 'me-2', getStatusClass(st.trim())]"
+            >
+              {{ st }}
+            </span>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -54,15 +62,13 @@ export default {
 
     const fetchOrders = async () => {
       try {
-        const res = await fetch(
-          "http://localhost/project_41970137_week3/php_api/show_orders.php"
-        );
+        const res = await fetch("http://localhost/project_MK/php_api/show_orders.php");
         const data = await res.json();
 
         if (data.success) {
           orders.value = data.data.map(o => ({
             ...o,
-            status: o.status || "รอดำเนินการ" // กำหนดค่าเริ่มต้น
+            status: o.status || "รอดำเนินการ"
           }));
         } else {
           error.value = data.message;
@@ -76,7 +82,6 @@ export default {
 
     onMounted(fetchOrders);
 
-    // กรองตามโต๊ะหรือรหัสคำสั่งซื้อ
     const filteredOrders = computed(() => {
       if (!searchText.value) return orders.value;
       return orders.value.filter(order =>
@@ -85,36 +90,50 @@ export default {
       );
     });
 
-    // สรุปยอดตาม order_id และ table_no รวมสถานะ
-const orderSummaries = computed(() => {
-  const summary = {};
-  filteredOrders.value.forEach(order => {
-    const key = `${order.order_id}-${order.table_no}`;
-    if (!summary[key]) {
-      summary[key] = {
-        order_id: order.order_id,
-        table_no: order.table_no,
-        total_amount: 0,
-        items_count: 0,
-        statusSet: new Set() // เก็บหลายสถานะ
-      };
-    }
-    summary[key].total_amount += Number(order.subtotal);
-    summary[key].items_count += 1;
-    summary[key].statusSet.add(order.status); // เพิ่มสถานะรายการนี้
-  });
+    const orderSummaries = computed(() => {
+      const summary = {};
+      filteredOrders.value.forEach(order => {
+        const key = `${order.order_id}-${order.table_no}`;
+        if (!summary[key]) {
+          summary[key] = {
+            order_id: order.order_id,
+            table_no: order.table_no,
+            total_amount: 0,
+            items_count: 0,
+            statusSet: new Set()
+          };
+        }
+        summary[key].total_amount += Number(order.subtotal);
+        summary[key].items_count += 1;
+        summary[key].statusSet.add(order.status);
+      });
 
-  // แปลง Set เป็นข้อความรวม
-  return Object.values(summary).map(s => ({
-    order_id: s.order_id,
-    table_no: s.table_no,
-    total_amount: s.total_amount,
-    items_count: s.items_count,
-    status: Array.from(s.statusSet).join(", ") // แสดงหลายสถานะถ้ามี
-  }));
-});
+      return Object.values(summary).map(s => ({
+        order_id: s.order_id,
+        table_no: s.table_no,
+        total_amount: s.total_amount,
+        items_count: s.items_count,
+        status: Array.from(s.statusSet).join(", ")
+      }));
+    });
 
-    return { orders, loading, error, searchText, orderSummaries };
+    // ✅ ฟังก์ชันกำหนดสีข้อความตามสถานะ (อัปเดตให้ครอบคลุม)
+    const getStatusClass = (status) => {
+      status = status.toLowerCase();
+
+      if (status.includes("สำเร็จ") || status.includes("เสร็จ") || status.includes("เสร็จแล้ว")) {
+        return "text-success";
+      }
+      if (status.includes("รอดำเนินการ") || status.includes("รอ") || status.includes("กำลังทำ")) {
+        return "text-warning";
+      }
+      if (status.includes("ยกเลิก") || status.includes("ผิดพลาด")) {
+        return "text-danger";
+      }
+      return "text-secondary";
+    };
+
+    return { orders, loading, error, searchText, orderSummaries, getStatusClass };
   },
 };
 </script>

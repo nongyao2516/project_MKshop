@@ -41,7 +41,7 @@
           <td>
             <select v-model="order.status" @change="updateStatus(order)">
               <option value="รอดำเนินการ">รอดำเนินการ</option>
-              <option value="กำลังทำ">กำลังทำ</option>
+              <option value="ยกเลิก">ยกเลิก</option>
               <option value="เสร็จแล้ว">เสร็จแล้ว</option>
             </select>
           </td>
@@ -69,7 +69,7 @@ export default {
     const fetchOrders = async () => {
       try {
         const res = await fetch(
-          "http://localhost/project_41970137_week3/php_api/show_orders.php"
+          "http://localhost/project_MK/php_api/show_orders.php"
         );
         const data = await res.json();
 
@@ -103,7 +103,7 @@ export default {
     const updateStatus = async (order) => {
       try {
         const res = await fetch(
-          "http://localhost/project_41970137_week3/php_api/update_order_status.php",
+          "http://localhost/project_MK/php_api/update_order_status.php",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
