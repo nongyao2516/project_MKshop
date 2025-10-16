@@ -8,18 +8,22 @@ $type = $_GET['type'] ?? 'table'; // default = table
 
 try {
     if ($type === 'daily') {
+        // ✅ รายงานยอดขายรายวัน (เฉพาะที่สถานะ = เสร็จแล้ว)
         $sql = "SELECT DATE(order_date) AS label, SUM(total_price) AS total 
                 FROM orders 
+                WHERE status = 'เสร็จแล้ว'
                 GROUP BY DATE(order_date)
                 ORDER BY DATE(order_date)";
     } elseif ($type === 'status') {
+        // ✅ จำนวนออเดอร์ตามสถานะ (แสดงทุกสถานะ)
         $sql = "SELECT status AS label, COUNT(*) AS total 
                 FROM orders 
                 GROUP BY status";
     } else {
-        // default = table
+        // ✅ ยอดขายตามโต๊ะ (เฉพาะที่สถานะ = เสร็จแล้ว)
         $sql = "SELECT table_no AS label, SUM(total_price) AS total 
                 FROM orders 
+                WHERE status = 'เสร็จแล้ว'
                 GROUP BY table_no
                 ORDER BY table_no";
     }

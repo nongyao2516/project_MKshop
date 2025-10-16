@@ -8,12 +8,21 @@ $status = $data['status'] ?? null;
 
 if ($order_id && $status) {
     try {
-        // อัปเดตสถานะทั้งหมดใน order_items ของคำสั่งซื้อนั้น
-        $stmt = $conn->prepare("UPDATE order_items SET status = ? WHERE order_id = ?");
-        $stmt->execute([$status, $order_id]);
-        
+        $conn->beginTransaction(); // เริ่ม transaction
+
+        // อัปเดตสถานะใน order_items
+        $stmt1 = $conn->prepare("UPDATE order_items SET status = ? WHERE order_id = ?");
+        $stmt1->execute([$status, $order_id]);
+
+        // อัปเดตสถานะใน orders
+        $stmt2 = $conn->prepare("UPDATE orders SET status = ? WHERE id = ?");
+        $stmt2->execute([$status, $order_id]);
+
+        $conn->commit(); // commit transaction
+
         echo json_encode(["success" => true]);
     } catch (Exception $e) {
+        $conn->rollBack(); // rollback ถ้ามี error
         echo json_encode(["success" => false, "message" => $e->getMessage()]);
     }
 } else {
