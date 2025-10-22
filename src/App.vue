@@ -36,7 +36,7 @@
   <a class="nav-link" href="/report">Report</a>
 </li>
             <li class="nav-item">
-              <a class="nav-link text-danger" href="#" @click="logout">Logout</a>
+              <a class="nav-link text-danger" href="/" @click="logout">Logout</a>
             </li>
           </template>
 
@@ -83,20 +83,26 @@ export default {
     },
     logout() {
       if (confirm("ต้องการออกจากระบบหรือไม่?")) {
+        // เคลียร์ข้อมูลทั้งหมดที่เกี่ยวข้องกับการล็อกอิน
         localStorage.removeItem("adminLogin");
+        localStorage.removeItem("username");
+        localStorage.removeItem("token");
         this.isLoggedIn = false;
-        this.$router.push("/login");
+
+        // กลับไปหน้าเมนูหลัก
+        this.$router.push("/");
       }
     },
   },
   watch: {
-    // เฝ้าดูเส้นทางเปลี่ยนแล้วตรวจสอบอีกครั้ง
+    // เมื่อเปลี่ยนเส้นทาง ให้ตรวจสอบสถานะการล็อกอินใหม่
     $route() {
       this.checkLogin();
     },
   },
 };
 </script>
+
 
 <style scoped>
 .navbar {
