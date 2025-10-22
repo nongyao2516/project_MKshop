@@ -2,16 +2,27 @@
   <div class="container my-5">
     <h2 class="text-center mb-4">📋 รายการคำสั่งซื้อทั้งหมด</h2>
 
-    <!-- 🔍 ค้นหาตามหมายเลขโต๊ะ -->
+    <!-- 🔍 ตัวกรองค้นหาและสถานะ -->
     <div class="mb-3 d-flex justify-content-between align-items-center">
-      <input
-        type="text"
-        class="form-control w-50"
-        placeholder="🔍 ค้นหาตามหมายเลขโต๊ะ..."
-        v-model="searchTable"
-      />
+      <div class="d-flex">
+        <select v-model="searchBy" class="form-select me-2 w-auto">
+          <option value="table_no">ค้นหาตามโต๊ะ</option>
+          <option value="order_id">ค้นหาตามรหัสคำสั่งซื้อ</option>
+        </select>
+        <input
+          type="text"
+          class="form-control me-2"
+          :placeholder="searchBy === 'table_no' ? '🔍 กรอกหมายเลขโต๊ะ...' : '🔍 กรอกรหัสคำสั่งซื้อ...'"
+          v-model="searchKeyword"
+        />
+        <select v-model="statusFilter" class="form-select w-auto">
+          <option value="">ทุกสถานะ</option>
+          <option value="รอดำเนินการ">รอดำเนินการ</option>
+          <option value="ยกเลิก">ยกเลิก</option>
+          <option value="เสร็จแล้ว">เสร็จแล้ว</option>
+        </select>
+      </div>
 
-      <!-- 🔢 เลือกจำนวนต่อหน้า -->
       <div>
         <label class="me-2">แสดงต่อหน้า:</label>
         <select v-model.number="rowsPerPage" class="form-select d-inline-block w-auto">
@@ -21,6 +32,13 @@
           <option :value="50">50</option>
         </select>
       </div>
+    </div>
+
+    <!-- ➕ ปุ่มลบรายการยกเลิกทั้งหมด -->
+    <div class="mb-3 text-end">
+      <button class="btn btn-danger" @click="deleteAllCancelledOrders">
+        ลบรายการยกเลิกทั้งหมด
+      </button>
     </div>
 
     <!-- ⏳ กำลังโหลด -->
@@ -40,6 +58,7 @@
           <th>ราคารวม</th>
           <th>วันที่สั่ง</th>
           <th>สถานะ</th>
+          <th>จัดการ</th>
         </tr>
       </thead>
       <tbody>
@@ -49,8 +68,8 @@
           <td>{{ order.product_id }}</td>
           <td>{{ order.product_name }}</td>
           <td>{{ order.quantity }}</td>
-          <td>{{ Number(order.price).toFixed(2) }}</td>
-          <td>{{ Number(order.subtotal).toFixed(2) }}</td>
+          <td>{{ order.price.toFixed(2) }}</td>
+          <td>{{ order.subtotal.toFixed(2) }}</td>
           <td>{{ order.order_date }}</td>
           <td>
             <select v-model="order.status" @change="updateStatus(order)">
@@ -59,32 +78,30 @@
               <option value="เสร็จแล้ว">เสร็จแล้ว</option>
             </select>
           </td>
+          <td class="text-center">
+            <button
+              v-if="order.status === 'ยกเลิก'"
+              class="btn btn-danger btn-sm"
+              @click="deleteOrder(order)"
+            >
+              ลบ
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
 
-    <!-- ❗ ไม่มีข้อมูล -->
     <div v-else-if="!loading" class="text-center text-muted">
       ❗ ยังไม่มีข้อมูลคำสั่งซื้อ
     </div>
 
     <!-- 📄 ปุ่มเปลี่ยนหน้า -->
     <div v-if="totalPages > 1" class="d-flex justify-content-center align-items-center mt-4">
-      <button
-        class="btn btn-secondary me-2"
-        :disabled="currentPage === 1"
-        @click="currentPage--"
-      >
+      <button class="btn btn-secondary me-2" :disabled="currentPage === 1" @click="currentPage--">
         ⬅ ก่อนหน้า
       </button>
-
       <span>หน้า {{ currentPage }} จาก {{ totalPages }}</span>
-
-      <button
-        class="btn btn-secondary ms-2"
-        :disabled="currentPage === totalPages"
-        @click="currentPage++"
-      >
+      <button class="btn btn-secondary ms-2" :disabled="currentPage === totalPages" @click="currentPage++">
         ถัดไป ➡
       </button>
     </div>
@@ -100,25 +117,35 @@ export default {
     const orders = ref([]);
     const loading = ref(true);
     const error = ref(null);
-    const searchTable = ref("");
+    const searchKeyword = ref("");
+    const searchBy = ref("table_no");
+    const statusFilter = ref("");
     const currentPage = ref(1);
-    const rowsPerPage = ref(10); // 👈 กำหนดค่าเริ่มต้น 10 แถวต่อหน้า
+    const rowsPerPage = ref(10);
 
     const fetchOrders = async () => {
+      loading.value = true;
+      error.value = null;
       try {
         const res = await fetch("http://localhost/project_MK/php_api/show_orders.php");
         const data = await res.json();
-
-        if (data.success) {
+        if (data.success && Array.isArray(data.data)) {
           orders.value = data.data.map((o) => ({
-            ...o,
+            order_id: o.order_id,
+            table_no: o.table_no,
+            product_id: o.product_id,
+            product_name: o.product_name,
+            quantity: Number(o.quantity),
+            price: Number(o.price),
+            subtotal: Number(o.subtotal || o.price * o.quantity),
+            order_date: o.order_date,
             status: o.status || "รอดำเนินการ",
           }));
         } else {
-          error.value = data.message;
+          error.value = data.message || "ไม่สามารถโหลดข้อมูลได้";
         }
       } catch (err) {
-        error.value = err.message;
+        error.value = "เกิดข้อผิดพลาด: " + err.message;
       } finally {
         loading.value = false;
       }
@@ -126,45 +153,77 @@ export default {
 
     onMounted(fetchOrders);
 
-    // 🔍 กรองตามโต๊ะ
     const filteredOrders = computed(() => {
-      if (!searchTable.value) return orders.value;
-      return orders.value.filter((order) =>
-        order.table_no.toString().includes(searchTable.value)
-      );
+      let result = orders.value;
+      if (statusFilter.value) {
+        result = result.filter(order => order.status === statusFilter.value);
+      }
+      if (searchKeyword.value) {
+        const keyword = searchKeyword.value.toString().toLowerCase();
+        result = result.filter(order => {
+          if (searchBy.value === "table_no") return order.table_no.toString().toLowerCase().includes(keyword);
+          if (searchBy.value === "order_id") return order.order_id.toString().toLowerCase().includes(keyword);
+          return true;
+        });
+      }
+      return result;
     });
 
-    // 📄 คำนวณหน้า
-    const totalPages = computed(() =>
-      Math.ceil(filteredOrders.value.length / rowsPerPage.value)
-    );
-
-    // 📋 ข้อมูลเฉพาะหน้านั้น ๆ
+    const totalPages = computed(() => Math.ceil(filteredOrders.value.length / rowsPerPage.value));
     const paginatedOrders = computed(() => {
       const start = (currentPage.value - 1) * rowsPerPage.value;
       return filteredOrders.value.slice(start, start + rowsPerPage.value);
     });
 
-    // 🔄 เมื่อเปลี่ยนแถวต่อหน้า ให้กลับไปหน้า 1
-    const resetPage = () => {
-      currentPage.value = 1;
-    };
-    watch(rowsPerPage, resetPage);
+    watch([rowsPerPage, statusFilter, searchKeyword], () => { currentPage.value = 1; });
 
-    // ✅ อัปเดตสถานะ
     const updateStatus = async (order) => {
       try {
         const res = await fetch("http://localhost/project_MK/php_api/update_order_status.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            order_id: order.order_id,
-            status: order.status,
-          }),
+          body: JSON.stringify({ order_id: order.order_id, product_id: order.product_id, status: order.status }),
         });
         const data = await res.json();
-        if (!data.success) {
-          alert("อัปเดตสถานะไม่สำเร็จ: " + data.message);
+        if (!data.success) alert("อัปเดตสถานะไม่สำเร็จ: " + (data.message || "เกิดข้อผิดพลาด"));
+        await fetchOrders();
+      } catch (err) { alert("เกิดข้อผิดพลาด: " + err.message); }
+    };
+
+    const deleteOrder = async (order) => {
+      if (!confirm(`คุณต้องการลบคำสั่งซื้อ ${order.order_id} หรือไม่?`)) return;
+      try {
+        const res = await fetch("http://localhost/project_MK/php_api/delete_order.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ order_id: order.order_id, product_id: order.product_id }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert("ลบคำสั่งซื้อเรียบร้อยแล้ว");
+          await fetchOrders();
+        } else {
+          alert("ลบไม่สำเร็จ: " + (data.message || "เกิดข้อผิดพลาด"));
+        }
+      } catch (err) {
+        alert("เกิดข้อผิดพลาด: " + err.message);
+      }
+    };
+
+    // ✅ ฟังก์ชันลบรายการยกเลิกทั้งหมด
+    const deleteAllCancelledOrders = async () => {
+      if (!confirm("คุณต้องการลบคำสั่งซื้อที่ยกเลิกทั้งหมดหรือไม่?")) return;
+      try {
+        const res = await fetch("http://localhost/project_MK/php_api/delete_cancelled_orders.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert("ลบคำสั่งซื้อที่ยกเลิกทั้งหมดเรียบร้อยแล้ว");
+          await fetchOrders();
+        } else {
+          alert("ลบไม่สำเร็จ: " + (data.message || "เกิดข้อผิดพลาด"));
         }
       } catch (err) {
         alert("เกิดข้อผิดพลาด: " + err.message);
@@ -172,26 +231,15 @@ export default {
     };
 
     return {
-      orders,
-      loading,
-      error,
-      searchTable,
-      currentPage,
-      rowsPerPage,
-      totalPages,
-      paginatedOrders,
-      updateStatus,
+      orders, loading, error, searchKeyword, searchBy, statusFilter,
+      currentPage, rowsPerPage, totalPages, paginatedOrders,
+      updateStatus, deleteOrder, deleteAllCancelledOrders
     };
   },
 };
 </script>
 
 <style scoped>
-.table {
-  font-size: 0.95rem;
-}
-select {
-  border-radius: 8px;
-  padding: 4px 8px;
-}
+.table { font-size: 0.95rem; }
+select { border-radius: 8px; padding: 4px 8px; }
 </style>
