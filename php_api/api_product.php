@@ -83,16 +83,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action) {
             }
             break;
 
-        case 'delete':
-            $product_id = $_POST['product_id'];
-            $stmt = $conn->prepare("DELETE FROM products WHERE product_id = :product_id");
-            $stmt->bindParam(':product_id', $product_id);
-            if ($stmt->execute()) {
-                echo json_encode(["message" => "ลบสินค้าสำเร็จ"]);
-            } else {
-                echo json_encode(["error" => "ลบสินค้าล้มเหลว"]);
-            }
-            break;
+      case 'delete':
+    $product_id = $_POST['product_id'];
+
+    // 🔍 ดึงชื่อไฟล์รูปจากฐานข้อมูลก่อนลบ
+    $stmt = $conn->prepare("SELECT image FROM products WHERE product_id = :product_id");
+    $stmt->bindParam(':product_id', $product_id);
+    $stmt->execute();
+    $product = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($product && !empty($product['image'])) {
+        $filePath = "uploads/" . $product['image'];
+        // 🧹 ลบไฟล์รูปถ้ามีอยู่จริง
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
+    }
+
+    // 🔥 ลบข้อมูลสินค้าออกจากฐานข้อมูล
+    $stmt = $conn->prepare("DELETE FROM products WHERE product_id = :product_id");
+    $stmt->bindParam(':product_id', $product_id);
+
+    if ($stmt->execute()) {
+        echo json_encode(["message" => "ลบสินค้าสำเร็จ และลบรูปภาพออกจากโฟลเดอร์แล้ว"]);
+    } else {
+        echo json_encode(["error" => "ลบสินค้าล้มเหลว"]);
+    }
+    break;
+
 
         default:
             echo json_encode(["error" => "Action ไม่ถูกต้อง"]);
