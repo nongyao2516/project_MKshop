@@ -18,10 +18,7 @@
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
           <!-- แสดงเฉพาะเมื่อเข้าสู่ระบบแล้ว -->
-          <template v-if="isLoggedIn">
-             <li class="nav-item">
-              <router-link class="nav-link" to="/">Menu</router-link>
-            </li>
+          <template v-if="isLoggedIn">  
             <li class="nav-item">
               <router-link class="nav-link" to="/orders">Orders</router-link>
             </li>

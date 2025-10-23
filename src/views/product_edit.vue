@@ -34,10 +34,10 @@
           </td>
           <td>
             <button class="btn btn-warning btn-sm me-2" @click="openEditModal(product)">
-              แก้ไข
+              <i class="bi bi-pencil-square"></i>แก้ไข
             </button>
             <button class="btn btn-danger btn-sm" @click="deleteProduct(product.product_id)">
-              ลบ
+              <i class="bi bi-trash3"></i>ลบ
             </button>
           </td>
         </tr>
